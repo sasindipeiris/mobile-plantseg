@@ -1,0 +1,13 @@
+
+# Not installed by pip, needed only for the phones:
+#   adb (Android platform-tools) and TFLite's prebuilt benchmark_model (Android arm64) for latency.
+
+# Training + evaluation
+torch                      
+timm                       
+pyyaml                     
+opencv-python-headless    
+
+# Deployment: PyTorch -> LiteRT (.tflite) 
+litert-torch               
+ai-edge-litert

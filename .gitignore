@@ -1,0 +1,11 @@
+
+/data
+/out
+__pycache__/
+*.py[cod]
+*.pt
+*.pth
+*.tflite
+.vscode/
+.idea/
+.DS_Store

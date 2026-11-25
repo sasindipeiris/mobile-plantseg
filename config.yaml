@@ -1,0 +1,73 @@
+paths:
+  raw_root: data/raw/plantseg # unzipped Zenodo v7 (Metadata.csv, images/, annotations/)
+  data_root: data/prepared # written by dataset/preprocess.py (classes.json inside)
+  imagenet_ckpt: out/ckpt/repvit_m0_9_distill_300e.pth
+  out: out/runs
+
+model:
+  backbone: repvit_m0_9
+  fpn_ch: 128
+  head_ch: 128
+  dropout: 0.1
+
+data:
+  ignore_index: 255
+  prepare_short_side: 1024
+  short_side: 512
+  max_long_side: 2048
+  crop: 512
+  scale_range: [0.5, 2.0]
+  cat_max_ratio: 0.75
+  hflip: 0.5
+  vflip: 0.5
+  brightness: 32
+  contrast: [0.8, 1.2]
+  saturation: [0.8, 1.2]
+  workers: 10
+
+train:
+  seed: 0
+  batch: 16
+  amp: true
+  log_every: 50
+  eval_every: 4000
+  val_subset: 500
+  poly_power: 0.9
+  min_lr_ratio: 0.01
+  loss: { ce: 1.0, dice: 1.0 }
+  stages:
+    frozen:
+      {
+        init: imagenet,
+        freeze_backbone: true,
+        iters: 8000,
+        warmup: 0,
+        lr: 1.0e-4,
+        backbone_lr_mult: 0.0,
+        weight_decay: 1.0e-4,
+      }
+    gentle:
+      {
+        init: frozen,
+        freeze_backbone: false,
+        iters: 20000,
+        warmup: 1000,
+        lr: 1.0e-4,
+        backbone_lr_mult: 0.1,
+        weight_decay: 0.01,
+      }
+
+export:
+  imgsz: 512
+  calib_images: 200
+  fuse_tol: 1.0e-4
+
+eval:
+  threads: 8
+
+demo:
+  split: test_demo
+  size: 100
+  min_lesion_iou: 0.6
+  min_short_side: 400
+  lesion_frac: [0.02, 0.6]
