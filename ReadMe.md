@@ -23,14 +23,32 @@ This repo contains an end to end pipeline for training a semantic segmentation m
 - **Splits:** 70/10/20
 - **Classes:** 116 total (`0` = background, `1–115` = disease lesions; `ignore_index = 255`)
 
+<p align="center">
+  <img src="diagrams/plantseg.png" alt="PlantSeg sample images with lesion annotations outlined in red" width="75%">
+  <br>
+  <em>Sample in-the-wild PlantSeg images with annotated lesion boundaries (red).</em>
+</p>
+
 ### Model
 
 - **Architecture:** `RepViT-M0.9` backbone + FPN neck + Semantic FPN head
 - **Pretrained weights:** `repvit_m0_9_distill_300e.pth` (distilled ImageNet-1K)
 
+<p align="center">
+  <img src="diagrams/architecture.png" alt="Model architecture: RepViT-M0.9 backbone, FPN neck, Semantic FPN head, upsampling, CE + Dice loss" width="75%">
+  <br>
+  <em>Model architecture: a RepViT-M0.9 backbone feeds an FPN neck (P2–P5, 128 ch) and a Semantic FPN head; logits are upsampled ×4 to 116 × 512 × 512 and supervised with CE + Dice loss.</em>
+</p>
+
 ### Training
 
 - **Loss:** `1.0 × CrossEntropyLoss(ignore_index=255)` + `1.0 × Batch-Present Soft Dice`
+
+<p align="center">
+  <img src="diagrams/2stage.png" alt="Two-stage training: frozen RepViT-M0.9 backbone, then end-to-end finetuning" width="75%">
+  <br>
+  <em>Two-stage training: Stage 1 trains only the FPN neck + head on a frozen backbone; Stage 2 finetunes the whole network from the best Stage 1 checkpoint.</em>
+</p>
 
 | Parameter                   | Frozen backbone                             | Full finetune                                           |
 | --------------------------- | ------------------------------------------- | ------------------------------------------------------- |
